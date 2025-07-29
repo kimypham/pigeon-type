@@ -1,0 +1,43 @@
+body {
+    background-color: #11111b;
+    color: #cba7f7;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.words {
+    justify-items: center;
+    padding: 20px;
+}
+
+.offFocusMessage {
+    opacity: 0;
+    justify-self: center;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+#cursor {
+    width: 2px;
+    height: 1rem;
+    background-color: antiquewhite;
+    position: fixed;
+    animation: blink 0.5s infinite;
+}
+
+.correct {
+    color: antiquewhite;
+}
+
+.incorrect {
+    color: palevioletred;
+}
