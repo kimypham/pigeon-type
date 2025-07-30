@@ -1,4 +1,17 @@
-const randomWords = ['dog'];
+async function getRandomWords(filePath, count = 20) {
+    try {
+        const response = await fetch(filePath);
+        const text = await response.text();
+        const words = text.trim().split('\n');
+
+        // Shuffle and take first 20
+        const shuffled = words.sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, count);
+    } catch (error) {
+        console.error('Error reading file:', error);
+        return [];
+    }
+}
 
 function displayWords(arrayOfWords) {
     const wordsToShow = arrayOfWords.join(' ');
@@ -36,11 +49,18 @@ function moveCursor(isBackspace, currentLetter) {
             cursor.style.left =
                 currentLetter.previousSibling.getBoundingClientRect().left +
                 'px';
+            cursor.style.top =
+                currentLetter.previousSibling.getBoundingClientRect().top +
+                'px';
         }
     } else {
         cursor.style.left = currentLetter.nextSibling
             ? currentLetter.nextSibling.getBoundingClientRect().left + 'px'
             : currentLetter.getBoundingClientRect().right + 'px';
+
+        cursor.style.top = currentLetter.nextSibling
+            ? currentLetter.nextSibling.getBoundingClientRect().top + 'px'
+            : currentLetter.getBoundingClientRect().top + 'px';
     }
 }
 
@@ -92,11 +112,11 @@ document.querySelector('.game').addEventListener('keyup', (event) => {
     }
 });
 
-function resetGame() {
+async function resetGame() {
+    const randomWords = await getRandomWords('words.txt', 20);
     displayWords(randomWords);
 
     document.querySelector('.letter').classList.add('current');
     document.querySelector('#cursor').style.left = '20px';
 }
-
 resetGame();
