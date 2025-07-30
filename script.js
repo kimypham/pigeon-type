@@ -1,3 +1,4 @@
+const numberOfWordsToType = 2;
 let secondsInterval = null;
 let secondsTaken = 0;
 let isPaused = false;
@@ -8,7 +9,6 @@ async function getRandomWords(filePath, count = 20) {
         const text = await response.text();
         const words = text.trim().split('\n');
 
-        // Shuffle and take first 20
         const shuffled = words.sort(() => 0.5 - Math.random());
         return shuffled.slice(0, count);
     } catch (error) {
@@ -34,20 +34,14 @@ function displayWords(arrayOfWords) {
 }
 
 document.querySelector('.game').addEventListener('blur', () => {
-    if (secondsInterval && !isPaused) {
-        clearInterval(secondsInterval);
-        isPaused = true;
-    }
+    pauseTimer();
 
     document.querySelector('.offFocusMessage').style.opacity = '1';
     document.querySelector('.game').style.filter = 'blur(5px)';
 });
 
 document.querySelector('.game').addEventListener('focus', () => {
-    if (isPaused) {
-        secondsInterval = setInterval(incrementSeconds, 1000);
-        isPaused = false;
-    }
+    resumeTimer();
 
     document.querySelector('.offFocusMessage').style.opacity = '0';
     document.querySelector('.game').style.filter = 'blur(0)';
@@ -121,6 +115,7 @@ function manageSpaceCharacter(key, isBackspace, currentLetter) {
 
     if (
         isBackspace &&
+        currentLetter.previousSibling &&
         currentLetter.previousSibling.classList.contains('extraLetter')
     ) {
         const characterSpan = document.createElement('span');
@@ -135,24 +130,50 @@ function manageSpaceCharacter(key, isBackspace, currentLetter) {
     return currentLetter;
 }
 
+function calcWordsPerMinute(wordsTyped, secondsTaken) {
+    if (secondsTaken === 0) return 0;
+    return Math.round((wordsTyped / secondsTaken) * 60);
+}
+
 document.querySelector('.game').addEventListener('keyup', (event) => {
     const key = event.key;
     const isBackspace = key === 'Backspace';
     let currentLetter = document.querySelector('.current');
 
-    moveCursor(isBackspace, currentLetter);
-    moveCurrent(isBackspace, currentLetter);
+    if (!currentLetter) {
+        if (isBackspace) {
+            const allLetters = document.querySelectorAll('.letter');
+            if (allLetters.length > 0) {
+                currentLetter = allLetters[allLetters.length - 1];
+                currentLetter.classList.add('current');
+                currentLetter.classList.remove('correct');
+                currentLetter.classList.remove('incorrect');
+                return;
+            }
+        }
+    }
 
-    manageCorrectOrIncorrectStyle(key, isBackspace, currentLetter);
+    if (currentLetter) {
+        moveCursor(isBackspace, currentLetter);
+        moveCurrent(isBackspace, currentLetter);
+        manageCorrectOrIncorrectStyle(key, isBackspace, currentLetter);
+        currentLetter = manageSpaceCharacter(key, isBackspace, currentLetter);
+    }
 
-    currentLetter = manageSpaceCharacter(key, isBackspace, currentLetter);
-
-    if (!currentLetter.nextSibling) {
+    const newCurrentLetter = document.querySelector('.current');
+    if (!newCurrentLetter && !isBackspace) {
         if (document.querySelectorAll('.incorrect').length > 0) {
-            alert('you have missing!');
+            pauseTimer();
+            alert('You have some incorrect words! Please fix.');
+            resumeTimer();
         } else {
             stopTimer();
-            alert('finish');
+            alert(
+                `You typed ${numberOfWordsToType} words in ${secondsTaken} seconds!\nWords per minute: ${calcWordsPerMinute(
+                    numberOfWordsToType,
+                    secondsTaken
+                )}`
+            );
             resetGame();
         }
     }
@@ -161,6 +182,20 @@ document.querySelector('.game').addEventListener('keyup', (event) => {
 function incrementSeconds() {
     secondsTaken++;
     document.querySelector('.timer').textContent = secondsTaken;
+}
+
+function pauseTimer() {
+    if (secondsInterval && !isPaused) {
+        clearInterval(secondsInterval);
+        isPaused = true;
+    }
+}
+
+function resumeTimer() {
+    if (isPaused) {
+        secondsInterval = setInterval(incrementSeconds, 1000);
+        isPaused = false;
+    }
 }
 
 function startTimer() {
@@ -180,7 +215,7 @@ function stopTimer() {
 async function resetGame() {
     stopTimer();
 
-    const randomWords = await getRandomWords('words.txt', 20);
+    const randomWords = await getRandomWords('words.txt', numberOfWordsToType);
     displayWords(randomWords);
 
     document.querySelector('.letter').classList.add('current');
