@@ -1,3 +1,7 @@
+let secondsInterval = null;
+let secondsTaken = 0;
+let isPaused = false;
+
 async function getRandomWords(filePath, count = 20) {
     try {
         const response = await fetch(filePath);
@@ -30,11 +34,21 @@ function displayWords(arrayOfWords) {
 }
 
 document.querySelector('.game').addEventListener('blur', () => {
+    if (secondsInterval && !isPaused) {
+        clearInterval(secondsInterval);
+        isPaused = true;
+    }
+
     document.querySelector('.offFocusMessage').style.opacity = '1';
     document.querySelector('.game').style.filter = 'blur(5px)';
 });
 
 document.querySelector('.game').addEventListener('focus', () => {
+    if (isPaused) {
+        secondsInterval = setInterval(incrementSeconds, 1000);
+        isPaused = false;
+    }
+
     document.querySelector('.offFocusMessage').style.opacity = '0';
     document.querySelector('.game').style.filter = 'blur(0)';
 });
@@ -137,17 +151,43 @@ document.querySelector('.game').addEventListener('keyup', (event) => {
         if (document.querySelectorAll('.incorrect').length > 0) {
             alert('you have missing!');
         } else {
+            stopTimer();
             alert('finish');
             resetGame();
         }
     }
 });
 
+function incrementSeconds() {
+    secondsTaken++;
+    document.querySelector('.timer').textContent = secondsTaken;
+}
+
+function startTimer() {
+    if (!secondsInterval && !isPaused) {
+        secondsInterval = setInterval(incrementSeconds, 1000);
+    }
+}
+
+function stopTimer() {
+    if (secondsInterval) {
+        clearInterval(secondsInterval);
+        secondsInterval = null;
+        isPaused = false;
+    }
+}
+
 async function resetGame() {
+    stopTimer();
+
     const randomWords = await getRandomWords('words.txt', 20);
     displayWords(randomWords);
 
     document.querySelector('.letter').classList.add('current');
     document.querySelector('#cursor').style.left = '20px';
+
+    secondsTaken = 0;
+    document.querySelector('.timer').textContent = secondsTaken;
+    startTimer();
 }
 resetGame();
