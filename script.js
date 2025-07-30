@@ -135,7 +135,15 @@ function calcWordsPerMinute(wordsTyped, secondsTaken) {
     return Math.round((wordsTyped / secondsTaken) * 60);
 }
 
+document.querySelector('.game').addEventListener('keydown', (event) => {
+    document
+        .querySelector('.pigeon-pic')
+        .setAttribute('src', 'pigeon-down.jpg');
+});
+
 document.querySelector('.game').addEventListener('keyup', (event) => {
+    document.querySelector('.pigeon-pic').setAttribute('src', 'pigeon-up.jpg');
+
     const key = event.key;
     const isBackspace = key === 'Backspace';
     let currentLetter = document.querySelector('.current');
