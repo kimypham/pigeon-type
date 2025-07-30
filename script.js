@@ -38,9 +38,7 @@ document.querySelector('.game').addEventListener('keyup', (event) => {
     const key = event.key;
     const currentWord = document.querySelector('.word.current');
     const currentLetter = document.querySelector('.current');
-    const expected = currentLetter?.innerHTML || ' ';
-    const isLetter = key.length === 1 && key !== ' ';
-    const isSpace = key === ' ';
+
     const isBackspace = key === 'Backspace';
 
     const cursor = document.querySelector('#cursor');
@@ -58,12 +56,25 @@ document.querySelector('.game').addEventListener('keyup', (event) => {
 
     currentLetter.classList.remove('current');
     if (isBackspace) {
-        cursor.style.left = getBoundingClientRect() + 'px';
-        currentLetter.previousSibling.classList.add('current');
-    } else {
-        currentLetter.nextSibling.classList.add('current');
         cursor.style.left =
-            currentLetter.nextSibling.getBoundingClientRect().left + 'px';
-        console.log(currentLetter.getBoundingClientRect().x);
+            currentLetter.previousSibling.getBoundingClientRect().left + 'px';
+        currentLetter.previousSibling.classList.add('current');
+        currentLetter.previousSibling.classList.remove('correct');
+        currentLetter.previousSibling.classList.remove('incorrect');
+    } else {
+        cursor.style.left = currentLetter.nextSibling
+            ? currentLetter.nextSibling.getBoundingClientRect().left + 'px'
+            : currentLetter.getBoundingClientRect().right + 'px';
+        if (currentLetter.nextSibling) {
+            currentLetter.nextSibling.classList.add('current');
+        }
+    }
+    console.log('ko', document.querySelectorAll('.incorrect'));
+    if (!currentLetter.nextSibling) {
+        if (document.querySelectorAll('.incorrect').length > 0) {
+            alert('you have missing!');
+        } else {
+            alert('finish');
+        }
     }
 });

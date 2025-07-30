@@ -4,9 +4,12 @@ body {
     font-family: 'Courier New', Courier, monospace;
 }
 
+.game {
+    padding: 20px;
+}
+
 .words {
     justify-items: center;
-    padding: 20px;
 }
 
 .offFocusMessage {
@@ -30,8 +33,9 @@ body {
     width: 2px;
     height: 1rem;
     background-color: antiquewhite;
-    position: fixed;
+    position: absolute;
     animation: blink 0.5s infinite;
+    transition: all 0.1s linear;
 }
 
 .correct {
