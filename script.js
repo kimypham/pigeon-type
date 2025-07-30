@@ -65,13 +65,13 @@ function moveCursor(isBackspace, currentLetter) {
 }
 
 function moveCurrent(isBackspace, currentLetter) {
+    currentLetter.classList.remove('current');
     if (isBackspace && currentLetter.previousSibling) {
         if (currentLetter.previousSibling.nodeType !== 3) {
             currentLetter.previousSibling.classList.add('current');
         }
     } else {
         if (currentLetter.nextSibling) {
-            currentLetter.classList.remove('current');
             currentLetter.nextSibling.classList.add('current');
         }
     }
@@ -92,15 +92,46 @@ function manageCorrectOrIncorrectStyle(key, isBackspace, currentLetter) {
     }
 }
 
+function manageSpaceCharacter(key, isBackspace, currentLetter) {
+    if (
+        key !== currentLetter.textContent &&
+        !isBackspace &&
+        currentLetter.textContent === ' '
+    ) {
+        const characterSpan = document.createElement('span');
+        characterSpan.className = 'letter extraLetter incorrect';
+        characterSpan.innerText = key;
+        currentLetter.parentNode.replaceChild(characterSpan, currentLetter);
+        currentLetter = characterSpan;
+    }
+
+    if (
+        isBackspace &&
+        currentLetter.previousSibling.classList.contains('extraLetter')
+    ) {
+        const characterSpan = document.createElement('span');
+        characterSpan.className = 'letter current';
+        characterSpan.innerText = ' ';
+        currentLetter.previousSibling.parentNode.replaceChild(
+            characterSpan,
+            currentLetter.previousSibling
+        );
+    }
+
+    return currentLetter;
+}
+
 document.querySelector('.game').addEventListener('keyup', (event) => {
     const key = event.key;
     const isBackspace = key === 'Backspace';
-    const currentLetter = document.querySelector('.current');
+    let currentLetter = document.querySelector('.current');
 
     moveCursor(isBackspace, currentLetter);
     moveCurrent(isBackspace, currentLetter);
 
     manageCorrectOrIncorrectStyle(key, isBackspace, currentLetter);
+
+    currentLetter = manageSpaceCharacter(key, isBackspace, currentLetter);
 
     if (!currentLetter.nextSibling) {
         if (document.querySelectorAll('.incorrect').length > 0) {
