@@ -2,7 +2,7 @@
 
 # Pigeon Type 🐦
 
-![Pigeon Type promotion picture](https://github.com/kimypham/pigeon-type/blob/main/demo.jpg)
+![Pigeon Type promotion picture](https://github.com/kimypham/pigeon-type/blob/main/demo.png)
 
 Pigeons are my favourite animal! So I made simple typing game with Vanilla JS :)
 
