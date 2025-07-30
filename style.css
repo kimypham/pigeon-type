@@ -2,14 +2,25 @@ body {
     background-color: #11111b;
     color: #cba7f7;
     font-family: 'Courier New', Courier, monospace;
+    height: 100%;
 }
 
 .game {
     padding: 20px;
 }
 
+.game:focus-visible {
+    outline: 2px solid #372a5b;
+    border-radius: 3px;
+}
+
 .words {
     justify-items: center;
+}
+
+.timer {
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 .offFocusMessage {

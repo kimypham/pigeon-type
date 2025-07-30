@@ -1,4 +1,4 @@
-const numberOfWordsToType = 2;
+const numberOfWordsToType = 20;
 let secondsInterval = null;
 let secondsTaken = 0;
 let isPaused = false;
